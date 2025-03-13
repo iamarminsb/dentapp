@@ -2,10 +2,10 @@ package com.test.test.service;
 
 import com.test.test.dto.DefectDto;
 import com.test.test.dto.ResponVisit;
-import com.test.test.dto.SingUpDto;
 import com.test.test.dto.VisitDto;
 import com.test.test.entity.EntityDefect;
 import com.test.test.entity.EntityVisit;
+import com.test.test.entity.Status;
 import com.test.test.entity.User;
 import com.test.test.repository.DefectRepository;
 import com.test.test.repository.Repository;
@@ -14,9 +14,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class Visitservice {
@@ -47,13 +45,15 @@ public class Visitservice {
         entityVisit.setElat(visitDto.getElat());
         entityVisit.setUser(user);
         user.add(entityVisit);
+        entityVisit.setStatus(Status.CHECK_DOCUMENTS);
+        visitDto.setStatusText(Status.CHECK_DOCUMENTS.getValue());
         visitRepository.save(entityVisit);
         return visitDto;
 
     }
     public List<ResponVisit> returnAllVisit(){
         List<EntityVisit> entityVisits= visitRepository.findAll();
-        List<ResponVisit> responVisits=entityVisits.stream().map(entityVisit -> new ResponVisit(entityVisit.getUser().getUsername())).toList();
+        List<ResponVisit> responVisits=entityVisits.stream().map(entityVisit -> new ResponVisit(entityVisit.getUser().getUsername(),entityVisit.getStatus().getValue())).toList();
         return responVisits;
     }
 
@@ -70,14 +70,31 @@ public class Visitservice {
         EntityVisit entityVisit=visitRepository.findById(id);
         entityDefect.setText(defectDto.getText());
         entityDefect.setEntityVisit(entityVisit);
+        entityVisit.setStatus(Status.DOCUMENT_DEFECTS);
+        defectDto.setStatusText(Status.DOCUMENT_DEFECTS.getValue());
         defectRepository.save(entityDefect);
+        visitRepository.save(entityVisit);
         return defectDto;
 
+    }
+    @Transactional
+    public String treatment(int id){
+        EntityVisit entityVisit=visitRepository.findById(id);
+        entityVisit.setStatus(Status.TREATMENT);
+        VisitDto visitDto=new VisitDto();
+        visitDto.setStatusText((Status.TREATMENT.getValue()));
+        visitRepository.save(entityVisit);
+        return visitDto.getStatusText();
     }
 
 
 
-
+    public List<ResponVisit> returnAllVisitChecked() {
+        List<EntityVisit> entityVisits = visitRepository.findAll();
+        List<EntityVisit> entityVisits1 = entityVisits.stream().filter(entityVisit -> entityVisit.getStatus() == Status.TREATMENT).toList();
+        List<ResponVisit> responVisits=entityVisits1.stream().map(entityVisit1 -> new ResponVisit(entityVisit1.getUser().getUsername(),entityVisit1.getStatus().getValue())).toList();
+        return responVisits;
+    }
 
 
 }

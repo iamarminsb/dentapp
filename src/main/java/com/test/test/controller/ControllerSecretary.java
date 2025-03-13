@@ -42,5 +42,11 @@ public class ControllerSecretary {
         return defectDto;
 
     }
+    @PostMapping("/secretary/{visitid}/ok")
+    public String treatment(@PathVariable int visitid){
+        return visitservice.treatment(visitid);
+
+
+    }
 
 }

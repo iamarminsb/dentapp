@@ -8,6 +8,7 @@ public class VisitDto {
     private String daromasrafi;
     private String sabeghe;
     private String elat;
+    private String statusText;
 
     public VisitDto(String username,String elat, String sabeghe, String daromasrafi) {
         this.username=username;

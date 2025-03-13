@@ -22,6 +22,8 @@ public class EntityVisit {
     private String daromasrafi;
     private String sabeghe;
     private String elat;
+    private Status status;
+    private List<Teeth> teeth;
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
